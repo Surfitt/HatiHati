@@ -1,9 +1,10 @@
-from openai import OpenAI
-import shelve
-from dotenv import load_dotenv
-import os
-import time
 import logging
+import os
+import shelve
+import time
+
+from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -11,25 +12,21 @@ OPENAI_ASSISTANT_ID = os.getenv("OPENAI_ASSISTANT_ID")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 
-def upload_file(path):
-    # Upload a file with an "assistants" purpose
-    file = client.files.create(
-        file=open("../../data/airbnb-faq.pdf", "rb"), purpose="assistants"
-    )
-
-
-def create_assistant(file):
-    """
-    You currently cannot set the temperature for Assistant via the API.
-    """
-    assistant = client.beta.assistants.create(
-        name="WhatsApp AirBnb Assistant",
-        instructions="You're a helpful WhatsApp assistant that can assist guests that are staying in our Paris AirBnb. Use your knowledge base to best respond to customer queries. If you don't know the answer, say simply that you cannot help with question and advice to contact the host directly. Be friendly and funny.",
-        tools=[{"type": "retrieval"}],
-        model="gpt-4-1106-preview",
-        file_ids=[file.id],
-    )
-    return assistant
+# TODO CREATE A CUSTOM SYSTEM INSTRUCTIONS FILE
+# TODO CREATE ASSISTANT INSTEAD OF USING PREMADE ONE
+# def create_assistant(file):
+#     """
+#     You currently cannot set the temperature for Assistant via the API.
+#     """
+#     instructs = open("../utils/system_intructs.txt", "r").read()
+#     assistant = client.beta.assistants.create(
+#         name="WhatsApp Surf Assistant",
+#         instructions=instructs,
+#         tools=[{"type": "retrieval"}],
+#         model="gpt-4o-mini",
+#         file_ids=[file.id],
+#     )
+#     return assistant
 
 
 # Use context manager to ensure the shelf file is closed properly

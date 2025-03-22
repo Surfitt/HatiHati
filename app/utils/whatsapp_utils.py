@@ -1,10 +1,11 @@
-import logging
-from flask import current_app, jsonify
 import json
-import requests
-
-# from app.services.openai_service import generate_response
+import logging
 import re
+
+import requests
+from flask import current_app, jsonify
+
+from app.services.openai_service import generate_response
 
 
 def log_http_response(response):
@@ -25,9 +26,9 @@ def get_text_message_input(recipient, text):
     )
 
 
-def generate_response(response):
-    # Return text in uppercase
-    return response.upper()
+# def generate_response(response):
+#     # Return text in uppercase
+#     return response.upper()
 
 
 def send_message(data):
@@ -83,11 +84,22 @@ def process_whatsapp_message(body):
     message_body = message["text"]["body"]
 
     # TODO: implement custom function here
-    response = generate_response(message_body)
+    # 1) Check if hh are the first 2 characters, otherwise return a default message
+    # 2) If hh, check if the message contains a valid surfspot name in each of the following websites:
+    # - https://www.surfline.com/surf-report/
+    # - https://www.windguru.cz/
+    # - https://nl.surf-forecast.com/
+
+    # 3) If valid surfspot or no surfspot is found, ask for more specifics or another surfspot
+    # 4) If a valid surfspot is found, return the surfspot name and the surf forecast for the next day.
+    # 4 needs to be done in steps - Get the surf forecast for each of the websites, and then combine them into a single response, I want to log these forecasts to a file so I can use them later for debugging purposes.
+
+    # OTHER TODO's
+    # Make a 'knowledge base' where people can add their own knowledge about the surfspots, and then use that knowledge to answer questions. i.e. Scheveningen is best at 2 hours before high tide, with a eastern soft wind etc...
 
     # OpenAI Integration
-    # response = generate_response(message_body, wa_id, name)
-    # response = process_text_for_whatsapp(response)
+    response = generate_response(message_body, wa_id, name)
+    response = process_text_for_whatsapp(response)
 
     data = get_text_message_input(current_app.config["RECIPIENT_WAID"], response)
     send_message(data)
